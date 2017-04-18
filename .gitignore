@@ -1,0 +1,11 @@
+.idea
+
+__pycache__/
+*.py[cod]
+
+.ipynb_checkpoints/
+
+.python-version
+
+datasets/ocr/frames/
+datasets/ocr/characters

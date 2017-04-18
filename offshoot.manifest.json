@@ -1,0 +1,32 @@
+{
+    "plugins": {
+        "YouMustBuildABoatGamePlugin": {
+            "name": "YouMustBuildABoatGamePlugin",
+            "version": "0.1.0",
+            "files": [
+                {
+                    "path": "you_must_build_a_boat_game.py",
+                    "pluggable": "Game"
+                }
+            ],
+            "libraries": [],
+            "config": {
+                "steam_app_id": 290890
+            }
+        },
+        "SuperHexagonGamePlugin": {
+            "name": "SuperHexagonGamePlugin",
+            "version": "0.1.0",
+            "files": [
+                {
+                    "path": "super_hexagon_game.py",
+                    "pluggable": "Game"
+                }
+            ],
+            "libraries": [],
+            "config": {
+                "frame_rate": 10
+            }
+        }
+    }
+}
