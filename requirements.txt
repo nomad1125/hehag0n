@@ -5,3 +5,5 @@ scikit-image==0.13.0
 redis==2.10.5
 scikit-learn==0.18.1
 editdistance==0.3.1
+invoke==0.16.3
+PyUserInput==0.1.11

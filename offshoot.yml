@@ -7,5 +7,5 @@ file_paths:
     config: config/config.plugins.yml
     libraries: requirements.plugins.txt
     plugins: plugins
-modules: ["lib.game"]
+modules: ["lib.game", "lib.game_agent"]
 sandbox_configuration_keys: true

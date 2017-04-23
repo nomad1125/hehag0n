@@ -27,6 +27,20 @@
             "config": {
                 "frame_rate": 10
             }
+        },
+        "SuperHexagonGameAgentPlugin": {
+            "name": "SuperHexagonGameAgentPlugin",
+            "version": "0.1.0",
+            "files": [
+                {
+                    "path": "super_hexagon_game_agent.py",
+                    "pluggable": "GameAgent"
+                }
+            ],
+            "libraries": [],
+            "config": {
+                "frame_handler": "collect_frames"
+            }
         }
     }
 }

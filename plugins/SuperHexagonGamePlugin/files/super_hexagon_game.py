@@ -27,7 +27,3 @@ class SuperHexagonGame(Game):
             SPLASH_ACTIONS=(349, 260, 391, 507),
             GAME_HUD_TIME=(0, 562, 52, 768)
         )
-
-    def on_frame(self, frame):
-        if self.ocr_classifier:
-            pprint(lib.ocr.image_contains(frame, ["start", "hexagon", "time", "level"], self.ocr_classifier, word_window_size=(1, 8)))

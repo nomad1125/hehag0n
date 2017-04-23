@@ -32,19 +32,22 @@ def image_contains(image, query, ocr_classifier, fuzziness=0, word_window_shape=
     result = dict()
 
     for word in query:
-        word = word.lower()
-
-        exact_match = word in words
-
-        if not exact_match and fuzziness >=
-
-        result[word] =
+        result[word] = word.lower() in words
 
     return result
 
 
-def image_region_contains(image, image_region, query, fuzziness=0, word_window_shape="rectangle", word_window_size=(1, 5)):
-    pass
+def image_region_contains(image, image_region, query, ocr_classifier, fuzziness=0, word_window_shape="rectangle", word_window_size=(1, 5)):
+    region_image = image[image_region[0]:image_region[2], image_region[1]:image_region[3]]
+
+    return image_contains(
+        region_image,
+        query,
+        ocr_classifier,
+        fuzziness=fuzziness,
+        word_window_shape=word_window_shape,
+        word_window_size=word_window_size
+    )
 
 
 def words_in_image(image, ocr_classifier, word_window_shape="rectangle", word_window_size=(1, 5)):
@@ -64,6 +67,17 @@ def words_in_image(image, ocr_classifier, word_window_shape="rectangle", word_wi
         characters[character_bounding_box] = character
 
     return reconstruct_words(character_and_word_data["word"]["bounding_boxes"], characters)
+
+
+def words_in_image_region(image, image_region, ocr_classifier, word_window_shape="rectangle", word_window_size=(1, 5)):
+    region_image = image[image_region[0]:image_region[2], image_region[1]:image_region[3]]
+
+    return words_in_image(
+        region_image,
+        ocr_classifier,
+        word_window_shape=word_window_shape,
+        word_window_size=word_window_size
+    )
 
 
 def extract_character_and_word_data(image, word_window_shape="square", word_window_size=3, preprocess_mode="FAST"):
@@ -100,13 +114,6 @@ def prepare_dataset_tokens(image, image_uuid, mode="FAST"):
     normalized_objects = normalize_objects(preprocessed_image, objects)
 
     save_objects("datasets/ocr/characters", objects, normalized_objects, image_uuid)
-
-
-def load_ocr_classifier(file_path):
-    with open(file_path, "rb") as f:
-        serialized_ocr_classifier = f.read()
-
-    return pickle.loads(serialized_ocr_classifier)
 
 
 def preprocess_image(image, mode="FAST"):

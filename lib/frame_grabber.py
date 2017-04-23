@@ -1,53 +1,48 @@
-import subprocess
-import shlex
-import time
+import numpy as np
 
-import skimage.io
+from PIL import Image
+
+import gi
+gi.require_version('Gdk', '3.0')
+
+from gi.repository import Gdk
+
+from redis import StrictRedis
+
+from lib.config import config
 
 
 class FrameGrabber:
 
-    def __init__(self, width=640, height=480, x_offset=0, y_offset=0, frame_rate=10, max_frames=99999999, max_retries=10, retry_delay=0.05):
+    def __init__(self, width=640, height=480, x_offset=0, y_offset=0):
         self.width = width
         self.height = height
 
         self.x_offset = x_offset
         self.y_offset = y_offset
 
-        self.frame_rate = frame_rate
+        self.redis_client = StrictRedis(**config["redis"])
 
-        self.max_frames = max_frames
-        self.max_retries = max_retries
-        self.retry_delay = retry_delay
+        # Clear any previously stored frames
+        self.redis_client.delete(config["frame_grabber"]["redis_key"])
 
-        self.process = None
+    def start(self):
+        while True:
+            self.redis_client.set(config["frame_grabber"]["redis_key"], self.grab_frame().tobytes())
 
-    def start(self, on_frame_callback):
-        ffmpeg_command = shlex.split(
-            f"ffmpeg -loglevel quiet -draw_mouse 0 -video_size {self.width}x{self.height} -framerate {self.frame_rate} -f x11grab "
-            f"-i :0.0+{self.x_offset},{self.y_offset} -r {self.frame_rate} frame_%015d.png"
-        )
+    def grab_frame(self):
+        window = Gdk.get_default_root_window()
 
-        self.process = subprocess.Popen(ffmpeg_command)
+        frame_buffer = Gdk.pixbuf_get_from_window(window, self.x_offset, self.y_offset, self.width, self.height)
+        frame_buffer_data = frame_buffer.get_pixels()
 
-        try:
-            current_frame = 1
-            current_retry = 0
+        stride = frame_buffer.props.rowstride
+        mode = "RGB"
 
-            while current_frame <= self.max_frames:
-                try:
-                    file_name = f"frame_{str(current_frame).zfill(15)}.png"
+        if frame_buffer.props.has_alpha:
+            mode = "RGBA"
 
-                    frame = skimage.io.imread(file_name)
-                    on_frame_callback(frame)
-                except FileNotFoundError as e:
-                    if current_retry < self.max_retries:
-                        time.sleep(self.retry_delay)
-                        current_retry += 1
-                        continue
+        pil_frame = Image.frombytes(mode, (self.width, self.height), frame_buffer_data, "raw", mode, stride)
+        frame = np.array(pil_frame)
 
-                current_frame += 1
-                current_retry = 0
-        finally:
-            subprocess.call("rm -f frame_*", shell=True)
-            self.process.kill()
+        return frame
