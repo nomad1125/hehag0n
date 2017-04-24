@@ -61,7 +61,24 @@ class SuperHexagonGameAgent(GameAgent):
             self.input_controller.tap_key(self.input_controller.keyboard.enter_key)
             time.sleep(10 / 60)
         elif context == "Game Screen":
-            time.sleep(5 / 60)
+            processed_frame_for_game_play = process_frame_for_game_play(frame)
+
+            player_bounding_box = get_player_character_bounding_box(processed_frame_for_game_play, self.game.screen_regions["GAME_PLAYER_AREA"])
+
+
+            # frame_center = [c // 2 for c in list(processed_frame_for_game_play.shape)]
+            # print(frame_center)
+
+            if player_bounding_box:
+                print(player_bounding_box)
+                possible_keys = (self.input_controller.keyboard.left_key, self.input_controller.keyboard.right_key)
+
+                self.input_controller.tap_key(
+                    random.choice(possible_keys),
+                    duration=random.uniform(0.0, 0.5)
+                )
+
+            time.sleep(1 / 60)
         elif context == "Death Screen":
             self.input_controller.tap_key(self.input_controller.keyboard.escape_key)
             time.sleep(10 / 60)

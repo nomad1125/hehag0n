@@ -111,7 +111,6 @@ class Game(offshoot.Pluggable):
             try:
                 game_agent.on_frame(frame)
             except Exception as e:
-                raise e
                 time.sleep(0.1)
 
     @offshoot.forbidden
