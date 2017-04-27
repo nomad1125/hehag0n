@@ -20,5 +20,6 @@ class SuperHexagonGame(Game):
         return dict(
             SPLASH_ACTIONS=(349, 260, 391, 507),
             GAME_HUD_TIME=(0, 562, 52, 768),
-            GAME_PLAYER_AREA=(129, 264, 366, 513)
+            GAME_PLAYER_AREA=(129, 264, 366, 513),
+            DEATH_TIME_LAST=(158, 600, 207, 768)
         )

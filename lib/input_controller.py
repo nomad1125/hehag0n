@@ -25,3 +25,11 @@ class InputController:
             self.keyboard.press_key(key)
             time.sleep(duration)
             self.keyboard.release_key(key)
+
+    def press_key(self, key):
+        if self.game_is_focused:
+            self.keyboard.press_key(key)
+
+    def release_key(self, key):
+        if self.game_is_focused:
+            self.keyboard.release_key(key)

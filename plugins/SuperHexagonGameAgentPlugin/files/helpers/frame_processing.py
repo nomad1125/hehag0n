@@ -13,28 +13,32 @@ def image_data_for_screen_region(frame, screen_region):
     return frame[screen_region[0]:screen_region[2], screen_region[1]:screen_region[3]]
 
 
-def process_frame_for_context(frame):
-    gray_frame = skimage.color.rgb2gray(frame)
+def grayscale_frame(frame):
+    return np.array(skimage.color.rgb2gray(frame) * 255, dtype="uint8")
 
-    threshold = skimage.filters.threshold_local(gray_frame, 21)
-    bw_frame = gray_frame > threshold
+
+def process_frame_for_context(frame):
+    """Assumes a grayscale frame"""
+    threshold = skimage.filters.threshold_local(frame, 21)
+    bw_frame = frame > threshold
 
     return skimage.transform.resize(bw_frame, (30, 48), mode="reflect", order=0).astype("bool").flatten()
 
 
 def process_frame_for_game_play(frame):
-    gray_frame = np.array(skimage.color.rgb2gray(frame) * 255, dtype="uint8")
+    """Assumes a grayscale frame"""
+    histogram = skimage.exposure.histogram(frame[40:])
 
-    histogram = skimage.exposure.histogram(gray_frame)
+    if np.unique(histogram[0]).size < 3:
+        return None
 
-    max_bin_indices = np.argpartition(histogram[0], -2)[-2:]
-    background_colors = [histogram[1][max_bin_indices[0]], histogram[1][max_bin_indices[1]]]
+    max_indices = np.argpartition(histogram[0], -3)[-3:]
 
-    gray_frame[gray_frame == background_colors[0]] = 0
-    gray_frame[gray_frame == background_colors[1]] = 0
+    for index in sorted(max_indices)[:2]:
+        frame[frame == index] = 0
 
-    threshold = skimage.filters.threshold_otsu(gray_frame[40:])
-    bw_frame = gray_frame > threshold
+    threshold = skimage.filters.threshold_otsu(frame[40:])
+    bw_frame = frame > threshold
 
     return bw_frame
 
